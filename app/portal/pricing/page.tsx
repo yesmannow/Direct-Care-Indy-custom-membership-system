@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency, centsToDollars } from '@/lib/currency';
 
+type InventoryItem = typeof inventory.$inferSelect;
+
 async function getMedications() {
   const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
@@ -21,10 +23,10 @@ export default async function PricingPage() {
   const allLabs = await getLabs();
 
   const avgMedPrice = allMedications.length > 0
-    ? centsToDollars(allMedications.reduce((sum, m) => sum + m.wholesalePrice, 0) / allMedications.length)
+    ? centsToDollars(allMedications.reduce((sum: number, m: InventoryItem) => sum + m.wholesalePrice, 0) / allMedications.length)
     : 0;
   const avgLabPrice = allLabs.length > 0
-    ? centsToDollars(allLabs.reduce((sum, l) => sum + l.wholesalePrice, 0) / allLabs.length)
+    ? centsToDollars(allLabs.reduce((sum: number, l: InventoryItem) => sum + l.wholesalePrice, 0) / allLabs.length)
     : 0;
 
   return (
@@ -70,7 +72,7 @@ export default async function PricingPage() {
                 Top 50 generic medications available at wholesale prices
               </CardDescription>
             </div>
-            <Badge variant="success">{allMedications.filter(m => m.stockLevel > 0).length} Available</Badge>
+            <Badge variant="success">{allMedications.filter((m: InventoryItem) => m.stockLevel > 0).length} Available</Badge>
           </div>
         </CardHeader>
         <CardContent>
@@ -85,8 +87,8 @@ export default async function PricingPage() {
             </TableHeader>
             <TableBody>
               {allMedications
-                .filter(med => med.stockLevel > 0)
-                .map((medication) => (
+                .filter((med: InventoryItem) => med.stockLevel > 0)
+                .map((medication: InventoryItem) => (
                   <TableRow key={medication.id}>
                     <TableCell className="font-medium">{medication.name}</TableCell>
                     <TableCell>{medication.dosage || '—'}</TableCell>
@@ -125,7 +127,7 @@ export default async function PricingPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allLabs.map((lab) => (
+              {allLabs.map((lab: InventoryItem) => (
                 <TableRow key={lab.id}>
                   <TableCell className="font-medium">{lab.name}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">

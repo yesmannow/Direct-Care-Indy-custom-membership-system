@@ -6,10 +6,10 @@ const nextConfig: NextConfig = {
   // This fixes the warning about multiple lockfiles detected
   outputFileTracingRoot: path.resolve(__dirname),
 
-  // Temporarily disable ESLint during build to avoid plugin errors
-  // ESLint can be run separately with: npm run lint
+  // ESLint is configured in eslint.config.mjs
+  // Set to false to enable linting during builds, or true to skip
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   // Optimize for Cloudflare Pages Edge Runtime
   experimental: {

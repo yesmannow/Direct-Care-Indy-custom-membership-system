@@ -6,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency } from '@/lib/currency';
 
+type Medication = typeof inventory.$inferSelect;
+
 async function getMedications() {
   const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
@@ -27,8 +29,8 @@ function isBelowParLevel(stockLevel: number, parLevel: number | null): boolean {
 }
 
 // Helper function to get the earliest expiration date for FIFO
-function getEarliestExpiration(medications: typeof inventory.$inferSelect[]): string | null {
-  const medicationsWithExp = medications.filter(m => m.expirationDate);
+function getEarliestExpiration(medications: Medication[]): string | null {
+  const medicationsWithExp = medications.filter((m: Medication) => m.expirationDate);
   if (medicationsWithExp.length === 0) return null;
 
   const sorted = medicationsWithExp.sort((a, b) => {
@@ -43,7 +45,7 @@ function getEarliestExpiration(medications: typeof inventory.$inferSelect[]): st
 export default async function MedicationsPage() {
   const allMedications = await getMedications();
 
-  const getStockBadge = (medication: typeof inventory.$inferSelect) => {
+  const getStockBadge = (medication: Medication) => {
     const { stockLevel, parLevel, expirationDate } = medication;
     const isExpiring = isExpiringSoon(expirationDate);
     const isLowStock = isBelowParLevel(stockLevel, parLevel);
@@ -67,7 +69,7 @@ export default async function MedicationsPage() {
   // Find the medication with the earliest expiration date (FIFO - First In, First Out)
   const earliestExpiration = getEarliestExpiration(allMedications);
 
-  const totalInventoryValue = allMedications.reduce((sum, med) => sum + med.wholesalePrice, 0);
+  const totalInventoryValue = allMedications.reduce((sum: number, med: Medication) => sum + med.wholesalePrice, 0);
   const avgPrice = allMedications.length > 0 ? totalInventoryValue / allMedications.length : 0;
 
   return (
@@ -96,7 +98,7 @@ export default async function MedicationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {allMedications.filter(m => m.stockLevel > 0).length}
+              {allMedications.filter((m: Medication) => m.stockLevel > 0).length}
             </div>
             <p className="text-xs text-muted-foreground">Available for dispensing</p>
           </CardContent>
@@ -128,7 +130,7 @@ export default async function MedicationsPage() {
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">Next to Use</p>
                 <p className="text-lg font-bold text-orange-900">
-                  {allMedications.find(m => m.expirationDate === earliestExpiration)?.name || 'N/A'}
+                  {allMedications.find((m: Medication) => m.expirationDate === earliestExpiration)?.name || 'N/A'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Expires: {new Date(earliestExpiration).toLocaleDateString()}
@@ -165,7 +167,7 @@ export default async function MedicationsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allMedications.map((medication) => {
+              {allMedications.map((medication: Medication) => {
                 const isExpiring = isExpiringSoon(medication.expirationDate);
                 const isLowStock = isBelowParLevel(medication.stockLevel, medication.parLevel);
                 const isNextToUse = medication.expirationDate === earliestExpiration;

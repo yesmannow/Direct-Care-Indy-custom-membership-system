@@ -6,6 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
+type Member = typeof members.$inferSelect;
+type Household = typeof households.$inferSelect;
+
 async function getMembers() {
   const db = await getDb();
   return await db.select().from(members).all();
@@ -21,8 +24,8 @@ export default async function AdminDashboard() {
   const allHouseholds = await getHouseholds();
 
   // Group members by household
-  const householdGroups = allHouseholds.map(household => {
-    const householdMembers = allMembers.filter(m => m.householdId === household.id);
+  const householdGroups = allHouseholds.map((household: Household) => {
+    const householdMembers = allMembers.filter((m: Member) => m.householdId === household.id);
     const totalDues = calculateHouseholdTotal(householdMembers);
     const savings = calculateHouseholdSavings(householdMembers);
 
@@ -35,7 +38,7 @@ export default async function AdminDashboard() {
   });
 
   // Calculate total revenue
-  const totalRevenue = householdGroups.reduce((sum, h) => sum + h.totalDues, 0);
+  const totalRevenue = householdGroups.reduce((sum: number, h: { totalDues: number }) => sum + h.totalDues, 0);
 
   return (
     <div className="space-y-8">
@@ -53,7 +56,7 @@ export default async function AdminDashboard() {
             <CardTitle className="text-sm font-medium">Total Members</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allMembers.filter(m => m.status === 'active').length}</div>
+            <div className="text-2xl font-bold">{allMembers.filter((m: Member) => m.status === 'active').length}</div>
             <p className="text-xs text-muted-foreground">Active memberships</p>
           </CardContent>
         </Card>
@@ -95,8 +98,8 @@ export default async function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {householdGroups.map(({ household, members: householdMembers, totalDues, savings }) => {
-                const totalBeforeCap = householdMembers.reduce((sum, m) => {
+              {householdGroups.map(({ household, members: householdMembers, totalDues, savings }: { household: Household; members: Member[]; totalDues: number; savings: number }) => {
+                const totalBeforeCap = householdMembers.reduce((sum: number, m: Member) => {
                   const dob = new Date(m.dateOfBirth);
                   return sum + calculateMemberMonthlyPrice(dob);
                 }, 0);
@@ -142,8 +145,8 @@ export default async function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allMembers.map((member) => {
-                const household = allHouseholds.find(h => h.id === member.householdId);
+              {allMembers.map((member: Member) => {
+                const household = allHouseholds.find((h: Household) => h.id === member.householdId);
                 const dob = new Date(member.dateOfBirth);
                 const age = calculateAge(dob);
                 const tier = getTierName(age);

@@ -38,8 +38,9 @@ A modern Direct Primary Care (DPC) membership platform built with Next.js 15, Cl
 ## 📦 Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- **Node.js**: >=20.18.0 (see `.nvmrc` or `package.json` engines)
 - npm or yarn
+- For local SQLite development: `better-sqlite3` will be installed automatically (requires native compilation on Windows - see troubleshooting section)
 
 ### Installation
 

@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCentsAsCurrency } from '@/lib/currency';
 
+type Lab = typeof inventory.$inferSelect;
+
 async function getLabs() {
   const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'lab')).all();
@@ -76,7 +78,7 @@ export default async function LabsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allLabs.map((lab) => (
+              {allLabs.map((lab: Lab) => (
                 <TableRow key={lab.id}>
                   <TableCell className="font-medium">{lab.name}</TableCell>
                   <TableCell className="text-muted-foreground">{lab.description || '—'}</TableCell>
