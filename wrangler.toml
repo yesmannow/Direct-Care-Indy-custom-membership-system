@@ -10,5 +10,5 @@ database_name = "prod-d1-directcare"
 database_id = "0588001d-f1f6-4412-b045-0c68a984d8bc"
 
 # Environment variables
+# Note: NODE_ENV is automatically set by Cloudflare Pages, no need to set it here
 [vars]
-NODE_ENV = "production"
