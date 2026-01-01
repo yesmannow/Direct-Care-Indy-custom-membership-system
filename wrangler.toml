@@ -1,12 +1,12 @@
-name = "direct-care-indy"
-compatibility_date = "2025-01-01"
+name = "direct-care-indy-custom-membership-system"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".open-next/.output"
 
 # Cloudflare D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "direct-care-indy-db"
+database_name = "prod-d1-directcare"
 database_id = "0588001d-f1f6-4412-b045-0c68a984d8bc"
 
 # Environment variables
