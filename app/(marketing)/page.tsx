@@ -115,7 +115,7 @@ export default function MarketingPage() {
               <div className="text-5xl mb-4">💰</div>
               <h3 className="text-xl font-semibold text-[#2C3E50]">Transparent Pricing</h3>
               <p className="text-gray-600">
-                No hidden fees, no surprise bills. Know exactly what you'll pay each month.
+                No hidden fees, no surprise bills. Know exactly what you&apos;ll pay each month.
               </p>
             </div>
             <div className="text-center space-y-4">
