@@ -1,7 +1,5 @@
 'use server';
 
-export const runtime = 'edge';
-
 import { getDb } from '@/db';
 import { members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
