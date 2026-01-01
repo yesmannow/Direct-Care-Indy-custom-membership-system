@@ -28,7 +28,7 @@ async function getInventory() {
 }
 
 // Calculate MRR data for the last 12 months
-function calculateMRRData(members: typeof members.$inferSelect[], households: typeof households.$inferSelect[]) {
+function calculateMRRData(membersList: typeof members.$inferSelect[], householdsList: typeof households.$inferSelect[]) {
   const months = [];
   const today = new Date();
 
@@ -37,19 +37,19 @@ function calculateMRRData(members: typeof members.$inferSelect[], households: ty
     const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     // For demo, we'll use current members but in production you'd track historical data
-    const activeMembers = members.filter(m => m.status === 'active');
-    const householdGroups = households.map(household => {
-      const householdMembers = activeMembers.filter(m => m.householdId === household.id);
+    const activeMembers = membersList.filter((m: typeof members.$inferSelect) => m.status === 'active');
+    const householdGroups = householdsList.map((household: typeof households.$inferSelect) => {
+      const householdMembers = activeMembers.filter((m: typeof members.$inferSelect) => m.householdId === household.id);
       return calculateMonthlyDues(householdMembers);
     });
-    const singleMembers = activeMembers.filter(m => !m.householdId);
-    const singleMemberRevenue = singleMembers.reduce((sum, m) => {
+    const singleMembers = activeMembers.filter((m: typeof members.$inferSelect) => !m.householdId);
+    const singleMemberRevenue = singleMembers.reduce((sum: number, m: typeof members.$inferSelect) => {
       const age = calculateAge(m.dateOfBirth);
       const tier = getAgeTier(age);
       return sum + getMonthlyRate(tier);
     }, 0);
 
-    const totalMRR = householdGroups.reduce((sum, dues) => sum + dues, 0) + singleMemberRevenue;
+    const totalMRR = householdGroups.reduce((sum: number, dues: number) => sum + dues, 0) + singleMemberRevenue;
 
     months.push({
       month: monthName,
@@ -65,21 +65,21 @@ export default async function AdminDashboard() {
   const allHouseholds = await getHouseholds();
   const inventoryItems = await getInventory();
 
-  const activeMembers = allMembers.filter(m => m.status === 'active');
+  const activeMembers = allMembers.filter((m: typeof members.$inferSelect) => m.status === 'active');
   const mrrData = calculateMRRData(allMembers, allHouseholds);
 
   // Calculate current MRR
-  const householdGroups = allHouseholds.map(household => {
-    const householdMembers = activeMembers.filter(m => m.householdId === household.id);
+  const householdGroups = allHouseholds.map((household: typeof households.$inferSelect) => {
+    const householdMembers = activeMembers.filter((m: typeof members.$inferSelect) => m.householdId === household.id);
     return calculateMonthlyDues(householdMembers);
   });
-  const singleMembers = activeMembers.filter(m => !m.householdId);
-  const singleMemberRevenue = singleMembers.reduce((sum, m) => {
+  const singleMembers = activeMembers.filter((m: typeof members.$inferSelect) => !m.householdId);
+  const singleMemberRevenue = singleMembers.reduce((sum: number, m: typeof members.$inferSelect) => {
     const age = calculateAge(m.dateOfBirth);
     const tier = getAgeTier(age);
     return sum + getMonthlyRate(tier);
   }, 0);
-  const currentMRR = householdGroups.reduce((sum, dues) => sum + dues, 0) + singleMemberRevenue;
+  const currentMRR = householdGroups.reduce((sum: number, dues: number) => sum + dues, 0) + singleMemberRevenue;
 
   return (
     <div className="min-h-screen bg-[#F0F0F0] py-8 px-4">

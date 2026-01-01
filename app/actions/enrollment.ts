@@ -36,7 +36,7 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
 
     // Determine status based on payment mode
     const PAYMENTS_MODE = process.env.PAYMENTS_MODE || 'demo';
-    const memberStatus = PAYMENTS_MODE === 'stripe' ? 'pending_payment' : 'active';
+    const memberStatus: 'active' | 'pending_payment' = PAYMENTS_MODE === 'stripe' ? 'pending_payment' : 'active';
 
     // Create household if household name is provided or if there are family members
     let householdId: number | null = null;
@@ -85,7 +85,7 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
             email: `${fm.firstName.toLowerCase()}.${fm.lastName.toLowerCase()}.${Date.now()}@temp.com`, // Unique temp email
             dateOfBirth: fm.dateOfBirth,
             householdId,
-            status: memberStatus as const,
+            status: memberStatus,
           }))
         )
         .returning();

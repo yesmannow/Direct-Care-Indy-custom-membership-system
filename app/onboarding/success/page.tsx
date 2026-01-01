@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
-export default function OnboardingSuccessPage({
+export default async function OnboardingSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
+  // Await searchParams (Next.js 15 requirement)
+  const params = await searchParams;
   // Demo mode: no session_id from Stripe checkout
-  const isDemoMode = !searchParams.session_id;
+  const isDemoMode = !params.session_id;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 py-12 px-4">
@@ -35,9 +37,9 @@ export default function OnboardingSuccessPage({
                 Demo Mode
               </Badge>
             )}
-            {!isDemoMode && searchParams.session_id && (
+            {!isDemoMode && params.session_id && (
               <Badge variant="outline" className="text-sm">
-                Session ID: {searchParams.session_id.substring(0, 20)}...
+                Session ID: {params.session_id.substring(0, 20)}...
               </Badge>
             )}
           </div>

@@ -13,7 +13,7 @@ async function getLabs() {
 export default async function LabsPage() {
   const allLabs = await getLabs();
 
-  const totalValue = allLabs.reduce((sum, lab) => sum + lab.wholesalePrice, 0);
+  const totalValue = allLabs.reduce((sum: number, lab: typeof inventory.$inferSelect) => sum + lab.wholesalePrice, 0);
   const avgPrice = allLabs.length > 0 ? totalValue / allLabs.length : 0;
 
   return (
@@ -42,7 +42,7 @@ export default async function LabsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCentsAsCurrency(Math.min(...allLabs.map(l => l.wholesalePrice)))}
+              {formatCentsAsCurrency(Math.min(...allLabs.map((l: typeof inventory.$inferSelect) => l.wholesalePrice)))}
             </div>
             <p className="text-xs text-muted-foreground">Most affordable test</p>
           </CardContent>
