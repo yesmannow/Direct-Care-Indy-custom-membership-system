@@ -89,7 +89,7 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
 export async function triggerWelcomeMessageForMember(memberId: number): Promise<{ success: boolean; error?: string }> {
   try {
     const db = await getDb();
-    const member = await db.select().from(members).where(eq(members.id, memberId)).get();
+    const [member] = await db.select().from(members).where(eq(members.id, memberId)).limit(1);
 
     if (!member) {
       return { success: false, error: 'Member not found' };

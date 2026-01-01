@@ -22,7 +22,8 @@ async function getCurrentMember() {
 async function getHousehold(householdId: number | null) {
   if (!householdId) return null;
   const db = await getDb();
-  return await db.select().from(households).where(eq(households.id, householdId)).get();
+  const [household] = await db.select().from(households).where(eq(households.id, householdId)).limit(1);
+  return household || null;
 }
 
 async function getInventory() {
