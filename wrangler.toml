@@ -1,12 +1,13 @@
 name = "direct-care-indy"
 compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
 
 # Cloudflare D1 Database binding
 [[d1_databases]]
 binding = "DB"
 database_name = "direct-care-indy-db"
-database_id = "your-database-id-here"
+database_id = "0588001d-f1f6-4412-b045-0c68a984d8bc"
 
 # Environment variables
 [vars]
