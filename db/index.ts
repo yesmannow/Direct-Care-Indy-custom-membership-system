@@ -3,6 +3,12 @@ import type { D1Database } from '@cloudflare/workers-types';
 import Database from 'better-sqlite3';
 import * as schema from './schema';
 
+// Global declaration for Cloudflare Pages D1 binding
+// Cloudflare Pages automatically injects the DB binding as a global variable
+declare global {
+  var DB: D1Database | undefined;
+}
+
 // Type-safe interface for Cloudflare environment
 export interface Env {
   DB: D1Database;
@@ -19,22 +25,34 @@ function isCloudflareEnv(env: unknown): env is Env {
   );
 }
 
-// Type-safe global context interface (no 'any')
-interface CloudflareGlobal {
-  env?: Env;
-  DB?: D1Database;
+// Initialize database for local development (synchronous)
+// This works for local development where we use better-sqlite3
+const sqlite = new Database('./local.db');
+const localDb = drizzle(sqlite, { schema });
+
+// Get database instance - automatically detects Cloudflare D1 or uses local SQLite
+async function getDbInstance() {
+  // Check for Cloudflare DB binding (available as global variable in Cloudflare Pages)
+  if (typeof globalThis.DB !== 'undefined' && globalThis.DB) {
+    // Cloudflare Pages environment - use D1 database
+    // Use dynamic import for D1 drizzle (ES modules compatible, no require())
+    const { drizzle: drizzleD1 } = await import('drizzle-orm/d1');
+    return drizzleD1(globalThis.DB, { schema });
+  }
+
+  // Local development - use SQLite
+  return localDb;
 }
 
-// For local development, we use better-sqlite3
-// For production on Cloudflare Pages, use D1 client via getDb()
-const sqlite = new Database('./local.db');
-const db = drizzle(sqlite, { schema });
+// Default export for backward compatibility (local development)
+// In Cloudflare Pages, use getDb() or getDbInstance() to access the D1 database
+const db = localDb;
 
-// Export function to get DB with environment context (for Cloudflare Pages Functions)
-// This is the type-safe way to get the database in Cloudflare environment
-// Returns D1 database in Cloudflare, SQLite in local development
+// Export function to get DB - automatically uses D1 in Cloudflare, SQLite locally
+// This is the recommended way to access the database in both environments
+// It checks for the global DB binding that Cloudflare Pages provides
 export const getDb = async (runtimeEnv?: Env) => {
-  // If runtime environment is provided and valid, use D1
+  // If runtime environment is provided (from PagesFunction context), use it
   if (runtimeEnv && isCloudflareEnv(runtimeEnv) && runtimeEnv.DB) {
     // Use dynamic import for D1 drizzle (ES modules compatible, no require())
     const { drizzle: drizzleD1 } = await import('drizzle-orm/d1');
@@ -47,23 +65,15 @@ export const getDb = async (runtimeEnv?: Env) => {
     return drizzleD1(runtimeEnv.DB, { schema });
   }
 
-  // Check global context as fallback (for Cloudflare Workers compatibility)
-  const globalContext = globalThis as CloudflareGlobal;
-
-  if (globalContext.env && isCloudflareEnv(globalContext.env) && globalContext.env.DB) {
-    const { drizzle: drizzleD1 } = await import('drizzle-orm/d1');
-    return drizzleD1(globalContext.env.DB, { schema });
-  }
-
-  if (globalContext.DB) {
-    const { drizzle: drizzleD1 } = await import('drizzle-orm/d1');
-    return drizzleD1(globalContext.DB, { schema });
-  }
-
-  // Fallback to local SQLite for development
-  return db;
+  // Check for global DB binding (Cloudflare Pages automatically provides this)
+  // This is the standard way to access D1 in Next.js App Router with OpenNext
+  return getDbInstance();
 };
 
-// Default export for local development and backward compatibility
-// In Cloudflare Pages Functions, use getDb(env) instead
-export { db, schema };
+// Default export - for local development (synchronous SQLite access)
+// For Cloudflare Pages: Use getDb() instead, which automatically detects the global DB binding
+//
+// Migration note: In server components/actions, you can:
+// - Keep using `db` for local development (works as-is)
+// - Use `await getDb()` for Cloudflare Pages (automatically uses global DB binding)
+export { db, schema, getDbInstance };
