@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, type DefaultValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,9 +40,9 @@ export function EnrollmentForm() {
       lastName: '',
       email: '',
       dateOfBirth: '',
-      householdName: '',
+      householdName: undefined,
       familyMembers: [],
-    },
+    } as DefaultValues<EnrollmentFormData>,
   });
 
   const { fields, append, remove } = useFieldArray({
