@@ -52,7 +52,7 @@ export function EnrollmentForm() {
 
   const watchedValues = watch();
   const primaryDob = watchedValues.dateOfBirth ? new Date(watchedValues.dateOfBirth) : null;
-  const familyMembers: Member[] = watchedValues.familyMembers.map((fm, index) => ({
+  const familyMembers: Member[] = (watchedValues.familyMembers || []).map((fm, index) => ({
     id: index + 1,
     firstName: fm.firstName,
     lastName: fm.lastName,
@@ -416,7 +416,7 @@ export function EnrollmentForm() {
                   </CardContent>
                 </Card>
 
-                {watchedValues.familyMembers.length > 0 && (
+                {watchedValues.familyMembers && watchedValues.familyMembers.length > 0 && (
                   <Card className="bg-[#F0F0F0] border-2 border-[#2C3E50]">
                     <CardHeader>
                       <CardTitle className="text-xl text-[#2C3E50]">
@@ -425,7 +425,7 @@ export function EnrollmentForm() {
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {watchedValues.familyMembers.map((member, index) => (
+                        {(watchedValues.familyMembers || []).map((member, index) => (
                           <li key={index} className="border-b border-gray-300 pb-2">
                             <strong>{member.firstName} {member.lastName}</strong>
                             <span className="text-gray-600 ml-2">DOB: {member.dateOfBirth}</span>
