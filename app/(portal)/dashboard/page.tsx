@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { members, households, inventory, services } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { calculateAge, getAgeTier, getMonthlyRate, formatCurrency } from '@/lib/pricing';
@@ -14,20 +14,24 @@ import { AccessCenter } from '@/components/access-center';
 // For demo purposes, we'll show the first member's portal
 // In production, this would be based on authentication
 async function getCurrentMember() {
+  const db = await getDb();
   const allMembers = await db.select().from(members).where(eq(members.status, 'active')).all();
   return allMembers[0] || null;
 }
 
 async function getHousehold(householdId: number | null) {
   if (!householdId) return null;
+  const db = await getDb();
   return await db.select().from(households).where(eq(households.id, householdId)).get();
 }
 
 async function getInventory() {
+  const db = await getDb();
   return await db.select().from(inventory).all();
 }
 
 async function getIncludedServices() {
+  const db = await getDb();
   return await db.select().from(services).where(eq(services.category, 'included')).all();
 }
 

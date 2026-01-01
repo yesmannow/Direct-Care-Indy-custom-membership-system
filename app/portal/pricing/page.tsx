@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { inventory } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency, centsToDollars } from '@/lib/currency';
 
 async function getMedications() {
+  const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
 }
 
 async function getLabs() {
+  const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'lab')).all();
 }
 
@@ -18,7 +20,7 @@ export default async function PricingPage() {
   const allMedications = await getMedications();
   const allLabs = await getLabs();
 
-  const avgMedPrice = allMedications.length > 0 
+  const avgMedPrice = allMedications.length > 0
     ? centsToDollars(allMedications.reduce((sum, m) => sum + m.wholesalePrice, 0) / allMedications.length)
     : 0;
   const avgLabPrice = allLabs.length > 0
@@ -145,8 +147,8 @@ export default async function PricingPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-green-800">
-            A Lipid Panel (cholesterol test) typically costs $100-$200 with insurance co-pays and deductibles. 
-            At Direct Care Indy, you pay just <strong>{formatCentsAsCurrency(500)}</strong> - our actual wholesale cost. 
+            A Lipid Panel (cholesterol test) typically costs $100-$200 with insurance co-pays and deductibles.
+            At Direct Care Indy, you pay just <strong>{formatCentsAsCurrency(500)}</strong> - our actual wholesale cost.
             That's the power of transparent healthcare pricing.
           </p>
         </CardContent>

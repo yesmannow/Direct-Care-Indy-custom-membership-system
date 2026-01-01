@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { members, households, inventory } from '@/db/schema';
 import { eq, like, or } from 'drizzle-orm';
 import { calculateAge, getAgeTier, getMonthlyRate, formatCurrency, calculateMonthlyDues } from '@/lib/pricing';
@@ -13,14 +13,17 @@ import { FinancialHealth } from '@/components/financial-health';
 import { TriageQueue } from '@/components/triage-queue';
 
 async function getMembers() {
+  const db = await getDb();
   return await db.select().from(members).all();
 }
 
 async function getHouseholds() {
+  const db = await getDb();
   return await db.select().from(households).all();
 }
 
 async function getInventory() {
+  const db = await getDb();
   return await db.select().from(inventory).all();
 }
 

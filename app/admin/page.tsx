@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { members, households } from '@/db/schema';
 import { calculateMemberMonthlyPrice, calculateHouseholdTotal, calculateAge, getTierName, calculateHouseholdSavings } from '@/lib/dues';
 import { formatCurrency } from '@/lib/currency';
@@ -7,10 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 
 async function getMembers() {
+  const db = await getDb();
   return await db.select().from(members).all();
 }
 
 async function getHouseholds() {
+  const db = await getDb();
   return await db.select().from(households).all();
 }
 
@@ -23,7 +25,7 @@ export default async function AdminDashboard() {
     const householdMembers = allMembers.filter(m => m.householdId === household.id);
     const totalDues = calculateHouseholdTotal(householdMembers);
     const savings = calculateHouseholdSavings(householdMembers);
-    
+
     return {
       household,
       members: householdMembers,
@@ -98,7 +100,7 @@ export default async function AdminDashboard() {
                   const dob = new Date(m.dateOfBirth);
                   return sum + calculateMemberMonthlyPrice(dob);
                 }, 0);
-                
+
                 return (
                   <TableRow key={household.id}>
                     <TableCell className="font-medium">{household.name}</TableCell>
@@ -146,7 +148,7 @@ export default async function AdminDashboard() {
                 const age = calculateAge(dob);
                 const tier = getTierName(age);
                 const monthlyRate = calculateMemberMonthlyPrice(dob);
-                
+
                 return (
                   <TableRow key={member.id}>
                     <TableCell className="font-medium">

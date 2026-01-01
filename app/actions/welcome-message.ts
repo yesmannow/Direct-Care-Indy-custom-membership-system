@@ -2,7 +2,7 @@
 
 export const runtime = 'edge';
 
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -24,6 +24,8 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
     const twentyThreeHoursAgo = new Date();
     twentyThreeHoursAgo.setHours(twentyThreeHoursAgo.getHours() - 23);
+
+    const db = await getDb();
 
     // Get all pending/active members
     // In a real implementation, you'd filter by enrollment date
@@ -89,6 +91,7 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
  */
 export async function triggerWelcomeMessageForMember(memberId: number): Promise<{ success: boolean; error?: string }> {
   try {
+    const db = await getDb();
     const member = await db.select().from(members).where(eq(members.id, memberId)).get();
 
     if (!member) {

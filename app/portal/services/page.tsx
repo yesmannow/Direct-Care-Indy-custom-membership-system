@@ -1,9 +1,10 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { services } from '@/db/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 async function getServices() {
+  const db = await getDb();
   return await db.select().from(services).all();
 }
 
@@ -36,7 +37,7 @@ export default async function ServicesPage() {
                 <Badge variant="success" className="text-base px-3 py-1">90% Covered</Badge>
               </div>
               <p className="text-sm text-green-900">
-                Most of your healthcare happens in primary care - sick visits, chronic disease management, 
+                Most of your healthcare happens in primary care - sick visits, chronic disease management,
                 preventive care, and basic procedures. These are all included in your membership.
               </p>
             </div>
@@ -45,7 +46,7 @@ export default async function ServicesPage() {
                 <Badge variant="outline" className="text-base px-3 py-1 border-amber-400 text-amber-800">10% Insurance</Badge>
               </div>
               <p className="text-sm text-amber-900">
-                For major events like hospitalizations, ER visits, and surgery, you'll use your health insurance or 
+                For major events like hospitalizations, ER visits, and surgery, you'll use your health insurance or
                 a cost-sharing program. We help coordinate this care.
               </p>
             </div>
@@ -120,7 +121,7 @@ export default async function ServicesPage() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-blue-800">
-            Not sure if a service is covered? Contact our care team and we'll help navigate your healthcare needs 
+            Not sure if a service is covered? Contact our care team and we'll help navigate your healthcare needs
             and determine the best approach - whether that's through your DPC membership or coordinating with insurance.
           </p>
         </CardContent>

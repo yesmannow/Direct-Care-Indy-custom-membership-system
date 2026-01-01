@@ -2,7 +2,7 @@
 
 export const runtime = 'edge';
 
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { members, households } from '@/db/schema';
 import { calculateMonthlyRate } from '@/lib/pricing';
 import type { EnrollmentFormData } from '@/lib/validations/enrollment';
@@ -18,6 +18,8 @@ export interface EnrollmentResult {
 
 export async function createEnrollment(data: EnrollmentFormData): Promise<EnrollmentResult> {
   try {
+    const db = await getDb();
+
     // Calculate monthly rate
     const primaryDob = new Date(data.dateOfBirth);
     const familyMembers: Member[] = data.familyMembers.map((fm, index) => ({

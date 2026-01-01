@@ -2,7 +2,7 @@
 
 export const runtime = 'edge';
 
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { auditLogs } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
@@ -31,6 +31,7 @@ export interface AuditLogParams {
  */
 export async function logAuditEvent(params: AuditLogParams): Promise<void> {
   try {
+    const db = await getDb();
     await db.insert(auditLogs).values({
       userId: params.userId,
       action: params.action,
@@ -56,6 +57,7 @@ export async function getAuditLogsForResource(
   resourceId: number
 ): Promise<typeof auditLogs.$inferSelect[]> {
   try {
+    const db = await getDb();
     return await db
       .select()
       .from(auditLogs)
@@ -78,6 +80,7 @@ export async function getAuditLogsForResource(
  */
 export async function getAuditLogsForUser(userId: string): Promise<typeof auditLogs.$inferSelect[]> {
   try {
+    const db = await getDb();
     return await db
       .select()
       .from(auditLogs)

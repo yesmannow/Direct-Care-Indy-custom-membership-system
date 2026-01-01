@@ -1,4 +1,4 @@
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { inventory } from '@/db/schema';
 import { eq, and, isNotNull } from 'drizzle-orm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency } from '@/lib/currency';
 
 async function getMedications() {
+  const db = await getDb();
   return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
 }
 
