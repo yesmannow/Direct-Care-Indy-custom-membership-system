@@ -6,6 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency, centsToDollars } from '@/lib/currency';
 
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
+
 type InventoryItem = typeof inventory.$inferSelect;
 
 async function getMedications() {

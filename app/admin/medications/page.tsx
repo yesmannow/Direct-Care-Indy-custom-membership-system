@@ -1,10 +1,13 @@
 import { getDb } from '@/db';
 import { inventory } from '@/db/schema';
-import { eq, and, isNotNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatCentsAsCurrency } from '@/lib/currency';
+
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
 
 type Medication = typeof inventory.$inferSelect;
 

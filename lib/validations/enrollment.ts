@@ -38,7 +38,7 @@ export const familyMemberSchema = z.object({
 // Step 2: Household Setup
 export const householdSetupSchema = z.object({
   householdName: z.string().min(1, 'Household name is required').max(100).optional(),
-  familyMembers: z.array(familyMemberSchema).optional().default([]),
+  familyMembers: z.array(familyMemberSchema).default([]),
 });
 
 // Complete Enrollment Form
@@ -50,11 +50,12 @@ export const enrollmentSchema = z.object({
   dateOfBirth: z.string(),
   // Step 2
   householdName: z.string().max(100).optional(),
-  familyMembers: z.array(familyMemberSchema).optional().default([]),
+  familyMembers: z.array(familyMemberSchema).default([]),
 });
 
 export type PatientProfileFormData = z.infer<typeof patientProfileSchema>;
 export type FamilyMemberFormData = z.infer<typeof familyMemberSchema>;
 export type HouseholdSetupFormData = z.infer<typeof householdSetupSchema>;
 export type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
+export type EnrollmentFormInput = z.input<typeof enrollmentSchema>;
 

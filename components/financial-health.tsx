@@ -58,7 +58,7 @@ export function FinancialHealth({ mrrData, currentMRR }: FinancialHealthProps) {
               tickFormatter={(value) => `$${value.toLocaleString()}`}
             />
             <Tooltip
-              formatter={(value: number) => formatCurrency(value)}
+              formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : '$0'}
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
             />
             <Legend />

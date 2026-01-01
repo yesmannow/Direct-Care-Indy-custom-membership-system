@@ -5,6 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCentsAsCurrency } from '@/lib/currency';
 
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
+
 type Lab = typeof inventory.$inferSelect;
 
 async function getLabs() {

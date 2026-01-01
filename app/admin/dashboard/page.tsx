@@ -1,16 +1,14 @@
 import { getDb } from '@/db';
 import { members, households, inventory } from '@/db/schema';
-import { eq, like, or } from 'drizzle-orm';
 import { calculateAge, getAgeTier, getMonthlyRate, formatCurrency, calculateMonthlyDues } from '@/lib/pricing';
-import { formatCentsAsCurrency } from '@/lib/currency';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PatientDirectory } from '@/components/patient-directory';
 import { DispensaryManager } from '@/components/dispensary-manager';
 import { FinancialHealth } from '@/components/financial-health';
 import { TriageQueue } from '@/components/triage-queue';
+
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
 
 async function getMembers() {
   const db = await getDb();

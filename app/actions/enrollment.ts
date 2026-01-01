@@ -3,7 +3,7 @@
 import { getDb } from '@/db';
 import { members, households } from '@/db/schema';
 import { calculateMonthlyRate } from '@/lib/pricing';
-import type { EnrollmentFormData } from '@/lib/validations/enrollment';
+import type { EnrollmentFormInput } from '@/lib/validations/enrollment';
 import type { Member } from '@/db/schema';
 
 export interface EnrollmentResult {
@@ -16,13 +16,13 @@ export interface EnrollmentResult {
   paymentMode?: 'stripe' | 'demo';
 }
 
-export async function createEnrollment(data: EnrollmentFormData): Promise<EnrollmentResult> {
+export async function createEnrollment(data: EnrollmentFormInput): Promise<EnrollmentResult> {
   try {
     const db = await getDb();
 
     // Calculate monthly rate
     const primaryDob = new Date(data.dateOfBirth);
-    const familyMembers: Member[] = data.familyMembers.map((fm, index) => ({
+    const familyMembers: Member[] = (data.familyMembers ?? []).map((fm, index) => ({
       id: index + 1, // Temporary ID for calculation
       firstName: fm.firstName,
       lastName: fm.lastName,
@@ -40,7 +40,7 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
 
     // Create household if household name is provided or if there are family members
     let householdId: number | null = null;
-    if (data.householdName || data.familyMembers.length > 0) {
+    if (data.householdName || (data.familyMembers ?? []).length > 0) {
       const householdName = data.householdName || `${data.firstName} ${data.lastName} Family`;
       const result = await db
         .insert(households)
@@ -75,11 +75,11 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
 
     // Create family members
     const memberIds = [primaryMember.id];
-    if (data.familyMembers.length > 0) {
+    if ((data.familyMembers ?? []).length > 0) {
       const familyResult = await db
         .insert(members)
         .values(
-          data.familyMembers.map((fm) => ({
+          (data.familyMembers ?? []).map((fm) => ({
             firstName: fm.firstName,
             lastName: fm.lastName,
             email: `${fm.firstName.toLowerCase()}.${fm.lastName.toLowerCase()}.${Date.now()}@temp.com`, // Unique temp email

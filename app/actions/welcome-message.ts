@@ -40,8 +40,8 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
         // 3. Send email via your email service (e.g., Resend, SendGrid)
         // 4. Update member record to mark message as sent
 
-        // Example email content:
-        const emailContent = {
+        // Example email content (commented out to avoid unused variable warning):
+        /* const emailContent = {
           to: member.email,
           subject: 'Welcome to Direct Care Indy - Your Orientation Guide',
           html: `
@@ -61,7 +61,7 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
             <p>Welcome to the family!</p>
             <p>The Direct Care Indy Team</p>
           `,
-        };
+        }; */
 
         // TODO: Integrate with email service
         // await sendEmail(emailContent);
