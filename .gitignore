@@ -50,3 +50,4 @@ local.db
 # wrangler
 .wrangler
 .dev.vars
+.env*.local
