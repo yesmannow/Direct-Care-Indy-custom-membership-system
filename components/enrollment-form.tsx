@@ -8,10 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   enrollmentSchema,
-  patientProfileSchema,
-  householdSetupSchema,
-  type EnrollmentFormData,
-  type FamilyMemberFormData
+  type EnrollmentFormInput,
 } from '@/lib/validations/enrollment';
 import { calculateMonthlyRate } from '@/lib/pricing';
 import { formatCurrency } from '@/lib/pricing';
@@ -32,7 +29,7 @@ export function EnrollmentForm() {
     watch,
     trigger,
     formState: { errors, isValid },
-  } = useForm<EnrollmentFormData>({
+  } = useForm<EnrollmentFormInput>({
     resolver: zodResolver(enrollmentSchema),
     mode: 'onChange',
     defaultValues: {
@@ -42,7 +39,7 @@ export function EnrollmentForm() {
       dateOfBirth: '',
       householdName: undefined,
       familyMembers: [],
-    } as DefaultValues<EnrollmentFormData>,
+    } as DefaultValues<EnrollmentFormInput>,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -99,7 +96,7 @@ export function EnrollmentForm() {
     }
   };
 
-  const onSubmit = async (data: EnrollmentFormData) => {
+  const onSubmit = async (data: EnrollmentFormInput) => {
     setIsSubmitting(true);
     setError(null);
 

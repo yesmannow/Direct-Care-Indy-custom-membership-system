@@ -2,14 +2,14 @@ import { getDb } from '@/db';
 import { members, households, inventory, services } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { calculateAge, getAgeTier, getMonthlyRate, formatCurrency } from '@/lib/pricing';
-import { formatCentsAsCurrency } from '@/lib/currency';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { WholesalePriceDirectory } from '@/components/wholesale-price-directory';
 import { IncludedServicesGuide } from '@/components/included-services-guide';
 import { AccessCenter } from '@/components/access-center';
+
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
 
 // For demo purposes, we'll show the first member's portal
 // In production, this would be based on authentication

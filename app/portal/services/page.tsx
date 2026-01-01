@@ -3,6 +3,9 @@ import { services } from '@/db/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
+
 async function getServices() {
   const db = await getDb();
   return await db.select().from(services);
