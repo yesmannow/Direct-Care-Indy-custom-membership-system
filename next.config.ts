@@ -11,39 +11,16 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // Optimize for Cloudflare Pages Edge Runtime
+  // Optimize for Vercel deployment
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
   },
-  // Prevent Webpack from trying to bundle better-sqlite3 (which uses 'fs')
-  serverExternalPackages: ["better-sqlite3"],
-
-  // Webpack configuration to exclude better-sqlite3 and its dependencies from bundling
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Exclude better-sqlite3 and its native dependencies from bundling
-      config.externals = config.externals || [];
-      config.externals.push({
-        'better-sqlite3': 'commonjs better-sqlite3',
-        'bindings': 'commonjs bindings',
-        'file-uri-to-path': 'commonjs file-uri-to-path',
-      });
-
-      // Ignore fs and path modules (Node.js built-ins not available in Edge runtime)
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-      };
-    }
-    return config;
-  },
 
   // Image optimization
   images: {
-    unoptimized: true, // Cloudflare handles image optimization
+    unoptimized: false, // Vercel handles image optimization
   },
 };
 

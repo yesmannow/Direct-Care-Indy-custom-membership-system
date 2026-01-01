@@ -1,17 +1,17 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { pgTable, text, integer, serial, timestamp, boolean, decimal } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 // Households Table - Groups family members together
-export const households = sqliteTable('households', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const households = pgTable('households', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(), // e.g., "The Smith Family"
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 // Members Table - Individual patients with Pike Medical DPC membership
-export const members = sqliteTable('members', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const members = pgTable('members', {
+  id: serial('id').primaryKey(),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
   email: text('email').notNull().unique(),
@@ -22,8 +22,8 @@ export const members = sqliteTable('members', {
 
 // Inventory Table - Consolidated medications and labs with wholesale pricing
 // Stores prices in CENTS to avoid floating-point precision issues
-export const inventory = sqliteTable('inventory', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const inventory = pgTable('inventory', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(), // e.g., "Amoxicillin" or "Lipid Panel"
   category: text('category').notNull(), // 'medication' or 'lab'
   wholesalePrice: integer('wholesale_price').notNull(), // Price in cents (e.g., 300 for $3.00)
@@ -37,8 +37,8 @@ export const inventory = sqliteTable('inventory', {
 });
 
 // Services Table - Define which services are covered (90%) vs insurance-only (10%)
-export const services = sqliteTable('services', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const services = pgTable('services', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   category: text('category').notNull(), // 'included' or 'insurance_only'
   description: text('description'),
@@ -46,13 +46,13 @@ export const services = sqliteTable('services', {
 
 // HIPAA-Compliant Audit Logs Table
 // Tracks "who, what, and when" for all PHI access and modifications
-export const auditLogs = sqliteTable('audit_logs', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const auditLogs = pgTable('audit_logs', {
+  id: serial('id').primaryKey(),
   userId: text('user_id').notNull(), // Provider/admin user ID (from auth system)
   action: text('action').notNull(), // 'READ', 'UPDATE', 'DELETE', 'CREATE'
   resourceType: text('resource_type').notNull(), // 'Member', 'Medication', 'Lab', 'Household', etc.
   resourceId: integer('resource_id').notNull(), // ID of the resource accessed/modified
-  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  timestamp: timestamp('timestamp').notNull().defaultNow(),
   ipAddress: text('ip_address'), // Optional: IP address for additional security tracking
   userAgent: text('user_agent'), // Optional: User agent for additional context
   details: text('details'), // Optional: JSON string with additional context about the action

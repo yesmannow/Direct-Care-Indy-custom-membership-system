@@ -1,6 +1,6 @@
 # Direct Care Indy - DPC Membership Platform
 
-A modern Direct Primary Care (DPC) membership platform built with Next.js 15, Cloudflare Pages, and Drizzle ORM.
+A modern Direct Primary Care (DPC) membership platform built with Next.js 15, Vercel, and Drizzle ORM.
 
 ## 🏥 Features
 
@@ -28,8 +28,8 @@ A modern Direct Primary Care (DPC) membership platform built with Next.js 15, Cl
 ## 🚀 Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
-- **Runtime**: Cloudflare Pages (Edge Runtime)
-- **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
+- **Runtime**: Vercel (Node.js Runtime)
+- **Database**: Vercel Postgres with Drizzle ORM
 - **Styling**: Tailwind CSS v4
 - **UI Components**: Shadcn/UI
 - **Language**: TypeScript
@@ -40,7 +40,8 @@ A modern Direct Primary Care (DPC) membership platform built with Next.js 15, Cl
 ### Prerequisites
 - **Node.js**: >=20.18.0 (see `.nvmrc` or `package.json` engines)
 - npm or yarn
-- For local SQLite development: `better-sqlite3` will be installed automatically (requires native compilation on Windows - see troubleshooting section)
+- **Vercel Account**: For production deployment (free tier available)
+- **Vercel Postgres Database**: Create one in your Vercel dashboard
 
 ### Installation
 
@@ -55,18 +56,26 @@ cd Direct-Care-Indy-custom-membership-system
 npm install
 ```
 
-3. Generate and seed the database
+3. Set up environment variables
+Create a `.env.local` file in the root directory:
+```bash
+POSTGRES_URL="your-vercel-postgres-connection-string"
+```
+
+For local development, you can use a local Postgres database or connect to your Vercel Postgres database.
+
+4. Generate and push the database schema
 ```bash
 npm run db:push
 npm run db:seed
 ```
 
-4. Run the development server
+5. Run the development server
 ```bash
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## 🗂️ Project Structure
 
@@ -119,134 +128,107 @@ Using Shadcn/UI components:
 - Badge for status indicators
 - Input for search functionality
 
-## 💾 Local SQLite vs Production D1
+## 💾 Database Setup
 
-This application uses different databases depending on the environment:
+This application uses **Vercel Postgres** for both development and production.
 
-### Local Development (SQLite)
-- **Database**: SQLite via `better-sqlite3`
-- **Location**: `./local.db` (created automatically)
-- **When**: `NODE_ENV=development` (default for `npm run dev`)
-- **Setup**: No configuration needed - database is created on first use
+### Environment Variables
 
-### Production (Cloudflare D1)
-- **Database**: Cloudflare D1 (SQLite-compatible)
-- **Binding**: `globalThis.DB` (automatically provided by Cloudflare Pages)
-- **When**: `NODE_ENV=production` (Cloudflare Pages sets this automatically)
-- **Setup**: Requires D1 database binding in `wrangler.toml` and Cloudflare Pages settings
+You need to set the following environment variable:
+
+- `POSTGRES_URL`: Connection string for your Vercel Postgres database
+
+### Local Development
+
+For local development, you have two options:
+
+1. **Use Vercel Postgres directly** (recommended):
+   - Get your connection string from the Vercel dashboard
+   - Add it to `.env.local` as `POSTGRES_URL`
+
+2. **Use a local Postgres database**:
+   - Install PostgreSQL locally
+   - Create a database
+   - Set `POSTGRES_URL` to your local connection string (e.g., `postgresql://user:password@localhost:5432/dbname`)
+
+### Production (Vercel)
+
+Vercel automatically provides the `POSTGRES_URL` environment variable when you:
+1. Create a Postgres database in your Vercel project
+2. Link it to your Next.js application
+
+The database connection is handled automatically by `@vercel/postgres` in production.
 
 ### How It Works
-The `getDb()` function in `db/index.ts` automatically detects the environment:
-1. **Production**: Uses D1 via `globalThis.DB` binding
-2. **Development**: Uses SQLite via `better-sqlite3` (only loaded in dev mode)
 
-**Important**: `better-sqlite3` is never bundled in production builds thanks to:
-- `serverExternalPackages: ["better-sqlite3"]` in `next.config.ts`
-- Dynamic `require()` only in development mode
-
-### Local SQLite (Windows) Troubleshooting
-
-If you encounter `"Native module not found: better-sqlite3"` or similar errors on Windows:
-
-#### 1. **Check Node.js Version**
-```bash
-node -v
-```
-Ensure you're running Node.js `>=20.19.0` (as specified in `package.json` engines). If not, update Node.js:
-- Use `nvm` (Node Version Manager) or download from [nodejs.org](https://nodejs.org/)
-
-#### 2. **Install Dependencies Correctly**
-**Never use `npm install --omit=dev`** for local development. Always run:
-```bash
-npm install
-```
-This ensures `better-sqlite3` (in `optionalDependencies`) is installed.
-
-#### 3. **Rebuild Native Module**
-If the native module fails to load, rebuild it:
-```bash
-npm run rebuild:sqlite
-```
-This recompiles `better-sqlite3` for your current Node.js version and platform.
-
-#### 4. **Visual Studio Build Tools (if compilation fails)**
-If `npm run rebuild:sqlite` fails with MSVC/compilation errors, install:
-- **Visual Studio Build Tools** with the **C++ workload**
-- Or install **Visual Studio Community** with C++ development tools
-- Download from: [Visual Studio Downloads](https://visualstudio.microsoft.com/downloads/)
-
-#### 5. **Workspace Root Warning**
-If Next.js warns about inferring workspace root from a parent directory (e.g., `C:\Users\hoosi\package-lock.json`):
-- **Fix**: Delete any stray `package-lock.json` files outside the project directory
-- The project's `next.config.ts` now explicitly sets `outputFileTracingRoot` to prevent this
-- Ensure only one `package-lock.json` exists (in the project root)
-
-#### 6. **Verify Installation**
-Test that `better-sqlite3` works:
-```bash
-node -e "require('better-sqlite3'); console.log('better-sqlite3 OK')"
-```
-If this fails, follow steps 2-4 above.
-
-#### Common Error Messages and Fixes
-
-| Error | Fix |
-|-------|-----|
-| `Cannot find module 'better-sqlite3'` | Run `npm install` (without `--omit=dev`) |
-| `Native module not found` | Run `npm run rebuild:sqlite` |
-| `MSVC` or compilation errors | Install Visual Studio Build Tools (C++ workload) |
-| `Node version mismatch` | Update Node.js to `>=20.19.0` |
-| Workspace root inferred incorrectly | Delete stray `package-lock.json` outside project |
+The `db` instance in `db/index.ts` uses `@vercel/postgres` to connect:
+- **Development**: Uses `POSTGRES_URL` from `.env.local`
+- **Production**: Uses `POSTGRES_URL` automatically provided by Vercel
 
 ## 🚢 Deployment
 
-### Cloudflare Pages
+### Deploy to Vercel
 
-1. **Install Wrangler CLI** (if not already installed)
+1. **Install Vercel CLI** (optional, for local deployment)
 ```bash
-npm install -g wrangler
+npm install -g vercel
 ```
 
-2. **Create D1 database**
-```bash
-wrangler d1 create direct-care-indy-db
-```
+2. **Create Vercel Postgres Database**
+   - Go to your Vercel dashboard
+   - Navigate to your project → Storage → Create Database
+   - Select "Postgres" and create a new database
+   - Note the connection string (automatically added as `POSTGRES_URL`)
 
-3. **Update `wrangler.toml`** with your database ID
-   - The `database_id` should match your D1 database
-   - The `binding` must be `DB` (matches `globalThis.DB`)
+3. **Apply Database Schema**
+   ```bash
+   # Generate migrations
+   npm run db:generate
 
-4. **Apply database schema to D1**
-```bash
-# Option 1: Use your SQL schema file
-wrangler d1 execute prod-d1-directcare --file=./d1-schema.sql
+   # Push schema to database (or use migrations)
+   npm run db:push
 
-# Option 2: Use Drizzle migrations (if you have them)
-npm run db:generate
-wrangler d1 execute prod-d1-directcare --file=./drizzle/<latest-migration>.sql
-```
+   # Seed the database (optional)
+   npm run db:seed
+   ```
 
-5. **Configure Cloudflare Pages Build Settings**
-   - **Build command**: `npm run build:cf` (NOT `npm run build`)
-   - **Build output directory**: `/.open-next/.output`
-   - **Node version**: `20.19.0` (set via `NODE_VERSION` environment variable)
-   - **Runtime compatibility flags**: Add `nodejs_compat` in Pages Settings → Runtime
+4. **Deploy to Vercel**
+   - **Option 1: Via Git** (recommended)
+     - Connect your Git repository to Vercel
+     - Vercel will automatically detect Next.js and deploy
+     - Environment variables (including `POSTGRES_URL`) are automatically set
 
-6. **Deploy**
-   - Push to your connected Git repository, or
-   - Deploy manually: `wrangler pages deploy .open-next/.output`
+   - **Option 2: Via CLI**
+     ```bash
+     vercel
+     ```
+     Follow the prompts to deploy your project.
+
+5. **Verify Deployment**
+   - Check that your application is running
+   - Verify database connectivity by visiting pages that use the database
+   - Check Vercel logs for any errors
+
+### Environment Variables in Vercel
+
+Vercel automatically provides these environment variables when you create a Postgres database:
+- `POSTGRES_URL`: Main connection string
+- `POSTGRES_PRISMA_URL`: Prisma-compatible connection string (if needed)
+- `POSTGRES_URL_NON_POOLING`: Direct connection string (for migrations)
+
+You don't need to manually set these - they're automatically configured.
 
 ## 📋 Available Scripts
 
-- `npm run dev` - Start development server (uses SQLite)
-- `npm run build` - Build Next.js app (used internally by OpenNext)
-- `npm run build:cf` - Build for Cloudflare Pages (use this for deployment)
-- `npm run preview` - Build and preview Cloudflare build locally
-- `npm run start` - Start production server (not used with Cloudflare Pages)
+- `npm run dev` - Start development server
+- `npm run build` - Build Next.js app for production
+- `npm run start` - Start production server (for local testing)
 - `npm run lint` - Run ESLint
-- `npm run db:push` - Push schema to local SQLite database
-- `npm run db:seed` - Seed local database with sample data
-- `npm run db:studio` - Open Drizzle Studio (local SQLite only)
+- `npm run db:generate` - Generate Drizzle migrations
+- `npm run db:migrate` - Run database migrations
+- `npm run db:push` - Push schema to database (development)
+- `npm run db:studio` - Open Drizzle Studio (database GUI)
+- `npm run db:seed` - Seed database with sample data
 
 ## 🧪 Verifying Database Connectivity
 
@@ -256,20 +238,20 @@ To verify database connectivity, you can:
 2. **Production**: Check that pages load correctly after deployment
 
 The database connection is automatically handled:
-- **Local**: Uses SQLite (`./local.db`) when `NODE_ENV=development`
-- **Production**: Uses Cloudflare D1 via `globalThis.DB` binding
+- **Local**: Uses `POSTGRES_URL` from `.env.local`
+- **Production**: Uses `POSTGRES_URL` automatically provided by Vercel
 
 ## 🔐 Security Notes
 
 - No payment integration included (by design)
-- Local SQLite database for development
-- Cloudflare D1 for production
-- Environment variables for sensitive data
+- Vercel Postgres for both development and production
+- Environment variables for sensitive data (connection strings)
+- All database connections use SSL/TLS encryption
 
 ## 🗺️ Technical Roadmap
 
 ### Phase 1: Database Alignment ✅
-- Age-tier and household-cap logic in SQLite schema
+- Age-tier and household-cap logic in Postgres schema
 - Pricing calculation utilities
 
 ### Phase 2: Dashboard ("The Mechanic") ✅

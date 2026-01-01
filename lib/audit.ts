@@ -1,6 +1,6 @@
 'use server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 import { getDb } from '@/db';
 import { auditLogs } from '@/db/schema';

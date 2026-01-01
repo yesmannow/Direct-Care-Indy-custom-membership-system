@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export default function MarketingPage() {
   return (

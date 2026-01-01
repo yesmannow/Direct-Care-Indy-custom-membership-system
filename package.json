@@ -5,11 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cf": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "eslint",
-    "rebuild:sqlite": "npm rebuild better-sqlite3 --verbose",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -20,9 +17,8 @@
     "node": ">=20.18.0"
   },
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20260101.0",
     "@hookform/resolvers": "^5.2.2",
-    "@opennextjs/cloudflare": "1.14.7",
+    "@vercel/postgres": "^0.12.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -30,23 +26,20 @@
     "drizzle-zod": "^0.8.3",
     "lucide-react": "^0.562.0",
     "next": "15.5.9",
+    "pg": "^8.13.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",
     "recharts": "^3.6.0",
     "stripe": "^20.1.0",
     "tailwind-merge": "^3.4.0",
-    "wrangler": "^4.53.0",
     "zod": "^4.3.4"
-  },
-  "optionalDependencies": {
-    "better-sqlite3": "^12.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@tailwindcss/postcss": "^4",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
+    "@types/pg": "^8.11.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.18.1",

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import ErrorBoundary from '@/components/error-boundary';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
   return (
