@@ -1,7 +1,5 @@
 'use server';
 
-export const runtime = 'edge';
-
 // Feature flag: PAYMENTS_MODE controls whether Stripe is enabled
 // Set PAYMENTS_MODE=stripe to enable Stripe, otherwise demo mode is used
 const PAYMENTS_MODE = process.env.PAYMENTS_MODE || 'demo';
