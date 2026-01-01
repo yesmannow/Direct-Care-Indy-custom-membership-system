@@ -6,7 +6,7 @@ const config: OpenNextConfig = {
       wrapper: "cloudflare-node",
       converter: "edge",
       proxyExternalRequest: "fetch",
-      // Added missing properties:
+      // These three properties are required:
       incrementalCache: "dummy",
       tagCache: "dummy",
       queue: "dummy",
@@ -18,13 +18,13 @@ const config: OpenNextConfig = {
       wrapper: "cloudflare-edge",
       converter: "edge",
       proxyExternalRequest: "fetch",
-      // Added missing properties:
+      // These three properties are required:
       incrementalCache: "dummy",
       tagCache: "dummy",
       queue: "dummy",
     },
   },
-  // If you use Node.js specific APIs like 'crypto', you might need this line:
+  // Keep this commented out unless you know you need it:
   // edgeExternals: ["node:crypto"],
 };
 
