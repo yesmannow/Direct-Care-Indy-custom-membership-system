@@ -16,11 +16,11 @@ export function calculateAge(dateOfBirth: string): number {
   const birthDate = new Date(dateOfBirth);
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
     age--;
   }
-  
+
   return age;
 }
 
@@ -127,4 +127,40 @@ export function formatCurrency(amount: number): string {
     style: 'currency',
     currency: 'USD',
   }).format(amount);
+}
+
+/**
+ * Calculate monthly rate for a household based on date of birth and family members
+ * Direct Care Indy tiers:
+ * - $69/mo (19-44)
+ * - $89/mo (45-64)
+ * - $109/mo (65+)
+ * Household Cap: $250/mo maximum
+ */
+export function calculateMonthlyRate(dob: Date, familyMembers: Member[]): number {
+  // Create a combined array including the primary member (from dob) and family members
+  const allMembers: Array<{ dateOfBirth: string }> = [
+    { dateOfBirth: dob.toISOString().split('T')[0] },
+    ...familyMembers.map(m => ({ dateOfBirth: m.dateOfBirth }))
+  ];
+
+  // Calculate individual rates for all members
+  const totalBeforeCap = allMembers.reduce((total, member) => {
+    const age = calculateAge(member.dateOfBirth);
+    let rate = 0;
+
+    if (age >= 19 && age <= 44) {
+      rate = 69;
+    } else if (age >= 45 && age <= 64) {
+      rate = 89;
+    } else if (age >= 65) {
+      rate = 109;
+    }
+    // Ages 0-18 are not included in the pricing tiers per requirements
+
+    return total + rate;
+  }, 0);
+
+  // Apply household cap of $250
+  return Math.min(totalBeforeCap, 250);
 }
