@@ -10,12 +10,12 @@ type InventoryItem = typeof inventory.$inferSelect;
 
 async function getMedications() {
   const db = await getDb();
-  return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
+  return await db.select().from(inventory).where(eq(inventory.category, 'medication'));
 }
 
 async function getLabs() {
   const db = await getDb();
-  return await db.select().from(inventory).where(eq(inventory.category, 'lab')).all();
+  return await db.select().from(inventory).where(eq(inventory.category, 'lab'));
 }
 
 export default async function PricingPage() {

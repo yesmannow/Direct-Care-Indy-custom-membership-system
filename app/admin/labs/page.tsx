@@ -9,7 +9,7 @@ type Lab = typeof inventory.$inferSelect;
 
 async function getLabs() {
   const db = await getDb();
-  return await db.select().from(inventory).where(eq(inventory.category, 'lab')).all();
+  return await db.select().from(inventory).where(eq(inventory.category, 'lab'));
 }
 
 export default async function LabsPage() {

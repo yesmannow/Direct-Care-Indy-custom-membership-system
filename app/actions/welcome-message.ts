@@ -30,8 +30,7 @@ export async function sendWelcomeMessages(): Promise<{ sent: number; errors: num
     const newMembers = await db
       .select()
       .from(members)
-      .where(eq(members.status, 'active'))
-      .all();
+      .where(eq(members.status, 'active'));
 
     for (const member of newMembers) {
       try {

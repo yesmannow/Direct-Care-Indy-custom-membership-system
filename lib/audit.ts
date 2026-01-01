@@ -66,8 +66,7 @@ export async function getAuditLogsForResource(
           eq(auditLogs.resourceType, resourceType),
           eq(auditLogs.resourceId, resourceId)
         )
-      )
-      .all();
+      );
   } catch (error) {
     console.error('Failed to retrieve audit logs:', error);
     return [];
@@ -84,8 +83,7 @@ export async function getAuditLogsForUser(userId: string): Promise<typeof auditL
     return await db
       .select()
       .from(auditLogs)
-      .where(eq(auditLogs.userId, userId))
-      .all();
+      .where(eq(auditLogs.userId, userId));
   } catch (error) {
     console.error('Failed to retrieve user audit logs:', error);
     return [];

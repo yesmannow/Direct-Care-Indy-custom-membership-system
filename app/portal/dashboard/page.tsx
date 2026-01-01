@@ -15,7 +15,7 @@ import { AccessCenter } from '@/components/access-center';
 // In production, this would be based on authentication
 async function getCurrentMember() {
   const db = await getDb();
-  const allMembers = await db.select().from(members).where(eq(members.status, 'active')).all();
+  const allMembers = await db.select().from(members).where(eq(members.status, 'active'));
   return allMembers[0] || null;
 }
 
@@ -27,12 +27,12 @@ async function getHousehold(householdId: number | null) {
 
 async function getInventory() {
   const db = await getDb();
-  return await db.select().from(inventory).all();
+  return await db.select().from(inventory);
 }
 
 async function getIncludedServices() {
   const db = await getDb();
-  return await db.select().from(services).where(eq(services.category, 'included')).all();
+  return await db.select().from(services).where(eq(services.category, 'included'));
 }
 
 export default async function PatientDashboard() {

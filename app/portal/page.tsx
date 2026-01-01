@@ -10,14 +10,14 @@ import { Badge } from '@/components/ui/badge';
 // In production, this would be based on authentication
 async function getCurrentMember() {
   const db = await getDb();
-  const allMembers = await db.select().from(members).all();
+  const allMembers = await db.select().from(members);
   return allMembers[0]; // Demo: showing first member
 }
 
 async function getHouseholdMembers(householdId: number | null) {
   if (!householdId) return [];
   const db = await getDb();
-  return await db.select().from(members).where(eq(members.householdId, householdId)).all();
+  return await db.select().from(members).where(eq(members.householdId, householdId));
 }
 
 async function getHousehold(householdId: number | null) {

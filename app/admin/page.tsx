@@ -11,12 +11,12 @@ type Household = typeof households.$inferSelect;
 
 async function getMembers() {
   const db = await getDb();
-  return await db.select().from(members).all();
+  return await db.select().from(members);
 }
 
 async function getHouseholds() {
   const db = await getDb();
-  return await db.select().from(households).all();
+  return await db.select().from(households);
 }
 
 export default async function AdminDashboard() {

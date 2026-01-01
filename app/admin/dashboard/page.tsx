@@ -14,17 +14,17 @@ import { TriageQueue } from '@/components/triage-queue';
 
 async function getMembers() {
   const db = await getDb();
-  return await db.select().from(members).all();
+  return await db.select().from(members);
 }
 
 async function getHouseholds() {
   const db = await getDb();
-  return await db.select().from(households).all();
+  return await db.select().from(households);
 }
 
 async function getInventory() {
   const db = await getDb();
-  return await db.select().from(inventory).all();
+  return await db.select().from(inventory);
 }
 
 // Calculate MRR data for the last 12 months

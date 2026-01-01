@@ -10,7 +10,7 @@ type Medication = typeof inventory.$inferSelect;
 
 async function getMedications() {
   const db = await getDb();
-  return await db.select().from(inventory).where(eq(inventory.category, 'medication')).all();
+  return await db.select().from(inventory).where(eq(inventory.category, 'medication'));
 }
 
 // Helper function to check if medication is expiring soon (within 30 days)

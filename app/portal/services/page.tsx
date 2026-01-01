@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 
 async function getServices() {
   const db = await getDb();
-  return await db.select().from(services).all();
+  return await db.select().from(services);
 }
 
 export default async function ServicesPage() {
