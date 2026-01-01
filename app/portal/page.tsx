@@ -6,6 +6,9 @@ import { formatCurrency } from '@/lib/currency';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
+
 // For demo purposes, we'll show the first member's portal
 // In production, this would be based on authentication
 async function getCurrentMember() {

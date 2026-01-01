@@ -6,6 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
+// Force dynamic rendering since we need database access
+export const dynamic = 'force-dynamic';
+
 type Member = typeof members.$inferSelect;
 type Household = typeof households.$inferSelect;
 
