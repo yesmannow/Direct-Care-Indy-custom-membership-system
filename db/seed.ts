@@ -1,8 +1,9 @@
-import { db } from './index';
+import { getDb } from './index';
 import { households, members, inventory, services } from './schema';
 
 async function seed() {
   console.log('🌱 Seeding database...');
+  const db = await getDb();
 
   // Create sample households
   const [household1] = await db.insert(households).values({
@@ -136,7 +137,7 @@ async function seed() {
     { name: 'Basic Labs', category: 'included', description: 'Common blood work at wholesale prices' },
     { name: 'EKG', category: 'included', description: 'Electrocardiogram testing' },
     { name: 'Nebulizer Treatments', category: 'included', description: 'In-office breathing treatments' },
-    
+
     // 10% Insurance-Only Services
     { name: 'Hospitalization', category: 'insurance_only', description: 'Inpatient hospital stays' },
     { name: 'Emergency Room Visits', category: 'insurance_only', description: 'ER visits for life-threatening emergencies' },

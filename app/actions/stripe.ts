@@ -2,14 +2,19 @@
 
 export const runtime = 'edge';
 
-import Stripe from 'stripe';
+// Feature flag: PAYMENTS_MODE controls whether Stripe is enabled
+// Set PAYMENTS_MODE=stripe to enable Stripe, otherwise demo mode is used
+const PAYMENTS_MODE = process.env.PAYMENTS_MODE || 'demo';
 
-// Initialize Stripe (use environment variable in production)
-// Note: Stripe will be undefined if secret key is not set
-let stripe: Stripe | null = null;
+// Lazy load Stripe only when needed (prevents import in demo mode)
+async function getStripe() {
+  if (PAYMENTS_MODE !== 'stripe' || !process.env.STRIPE_SECRET_KEY) {
+    return null;
+  }
 
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  // Dynamic import to prevent Stripe from loading in demo mode
+  const Stripe = (await import('stripe')).default;
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2024-12-18.acacia',
   });
 }
@@ -25,7 +30,17 @@ export async function createCheckoutSession(
   memberIds: number[],
   householdId?: number
 ): Promise<StripeCheckoutResult> {
+  // Demo mode: return no-op response
+  if (PAYMENTS_MODE !== 'stripe') {
+    return {
+      success: false,
+      error: 'Payments are disabled in demo mode. Set PAYMENTS_MODE=stripe to enable Stripe.',
+    };
+  }
+
   try {
+    const stripe = await getStripe();
+
     if (!stripe || !process.env.STRIPE_SECRET_KEY) {
       return {
         success: false,

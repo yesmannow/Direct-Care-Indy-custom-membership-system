@@ -14,6 +14,8 @@ export interface EnrollmentResult {
   memberIds?: number[];
   monthlyRate?: number;
   error?: string;
+  redirectUrl?: string;
+  paymentMode?: 'stripe' | 'demo';
 }
 
 export async function createEnrollment(data: EnrollmentFormData): Promise<EnrollmentResult> {
@@ -33,6 +35,10 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
     }));
 
     const monthlyRate = calculateMonthlyRate(primaryDob, familyMembers);
+
+    // Determine status based on payment mode
+    const PAYMENTS_MODE = process.env.PAYMENTS_MODE || 'demo';
+    const memberStatus = PAYMENTS_MODE === 'stripe' ? 'pending_payment' : 'active';
 
     // Create household if household name is provided or if there are family members
     let householdId: number | null = null;
@@ -60,7 +66,7 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
         email: data.email,
         dateOfBirth: data.dateOfBirth,
         householdId,
-        status: 'pending_payment',
+        status: memberStatus,
       })
       .returning();
 
@@ -81,7 +87,7 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
             email: `${fm.firstName.toLowerCase()}.${fm.lastName.toLowerCase()}.${Date.now()}@temp.com`, // Unique temp email
             dateOfBirth: fm.dateOfBirth,
             householdId,
-            status: 'pending_payment' as const,
+            status: memberStatus as const,
           }))
         )
         .returning();
@@ -90,11 +96,15 @@ export async function createEnrollment(data: EnrollmentFormData): Promise<Enroll
       memberIds.push(...insertedMembers.map((m) => m.id).filter((id): id is number => id !== undefined));
     }
 
+    const paymentMode = PAYMENTS_MODE === 'stripe' ? 'stripe' : 'demo';
+
     return {
       success: true,
       householdId: householdId || undefined,
       memberIds,
       monthlyRate,
+      paymentMode,
+      redirectUrl: paymentMode === 'demo' ? '/onboarding/success' : undefined,
     };
   } catch (error) {
     console.error('Enrollment creation error:', error);

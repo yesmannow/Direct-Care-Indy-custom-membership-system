@@ -1,10 +1,9 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
 import type { D1Database } from '@cloudflare/workers-types';
-import Database from 'better-sqlite3';
 import * as schema from './schema';
 
 // Global declaration for Cloudflare Pages D1 binding
 // Cloudflare Pages automatically injects the DB binding as a global variable
+// Binding name must be exactly "DB" as configured in wrangler.toml
 declare global {
   var DB: D1Database | undefined;
 }
@@ -25,14 +24,12 @@ function isCloudflareEnv(env: unknown): env is Env {
   );
 }
 
-// Initialize database for local development (synchronous)
-// This works for local development where we use better-sqlite3
-const sqlite = new Database('./local.db');
-const localDb = drizzle(sqlite, { schema });
-
 // Get database instance - automatically detects Cloudflare D1 or uses local SQLite
+// CRITICAL: In production (Cloudflare), this ONLY uses D1 via globalThis.DB
+// better-sqlite3 is NEVER imported or executed in Cloudflare environment
 async function getDbInstance() {
   // Check for Cloudflare DB binding (available as global variable in Cloudflare Pages)
+  // This is the ONLY way to access D1 in production
   if (typeof globalThis.DB !== 'undefined' && globalThis.DB) {
     // Cloudflare Pages environment - use D1 database
     // Use dynamic import for D1 drizzle (ES modules compatible, no require())
@@ -40,13 +37,22 @@ async function getDbInstance() {
     return drizzleD1(globalThis.DB, { schema });
   }
 
-  // Local development - use SQLite
-  return localDb;
+  // Local development ONLY - dynamically import better-sqlite3
+  // This code path NEVER executes in Cloudflare Pages (globalThis.DB is always present there)
+  // Only import better-sqlite3 when NOT in Cloudflare environment
+  try {
+    const { drizzle } = await import('drizzle-orm/better-sqlite3');
+    const Database = (await import('better-sqlite3')).default;
+    const sqlite = new Database('./local.db');
+    return drizzle(sqlite, { schema });
+  } catch (error) {
+    // If better-sqlite3 is not available (e.g., in Cloudflare), throw clear error
+    throw new Error(
+      'Database not available. In Cloudflare Pages, ensure DB binding is configured. ' +
+      'In local development, ensure better-sqlite3 is installed.'
+    );
+  }
 }
-
-// Default export for backward compatibility (local development)
-// In Cloudflare Pages, use getDb() or getDbInstance() to access the D1 database
-const db = localDb;
 
 // Export function to get DB - automatically uses D1 in Cloudflare, SQLite locally
 // This is the recommended way to access the database in both environments
@@ -70,10 +76,9 @@ export const getDb = async (runtimeEnv?: Env) => {
   return getDbInstance();
 };
 
-// Default export - for local development (synchronous SQLite access)
-// For Cloudflare Pages: Use getDb() instead, which automatically detects the global DB binding
-//
-// Migration note: In server components/actions, you can:
-// - Keep using `db` for local development (works as-is)
-// - Use `await getDb()` for Cloudflare Pages (automatically uses global DB binding)
-export { db, schema, getDbInstance };
+// CRITICAL: Do NOT export `db` directly - it would import better-sqlite3 at module load
+// All server code MUST use `await getDb()` to ensure Cloudflare compatibility
+// The `db` export is removed to prevent accidental usage in production code
+
+// Export schema for type definitions
+export { schema, getDbInstance };

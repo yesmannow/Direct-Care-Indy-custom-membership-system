@@ -6,6 +6,9 @@ export default function OnboardingSuccessPage({
 }: {
   searchParams: { session_id?: string };
 }) {
+  // Demo mode: no session_id from Stripe checkout
+  const isDemoMode = !searchParams.session_id;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-slate-50 py-12 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -23,9 +26,16 @@ export default function OnboardingSuccessPage({
               Welcome to the Family! 🎉
             </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Your enrollment is complete. You're now a member of Direct Care Indy.
+              {isDemoMode
+                ? 'Enrollment complete (Demo Mode). You\'re now a member of Direct Care Indy.'
+                : 'Your enrollment is complete. You\'re now a member of Direct Care Indy.'}
             </p>
-            {searchParams.session_id && (
+            {isDemoMode && (
+              <Badge variant="outline" className="text-sm">
+                Demo Mode
+              </Badge>
+            )}
+            {!isDemoMode && searchParams.session_id && (
               <Badge variant="outline" className="text-sm">
                 Session ID: {searchParams.session_id.substring(0, 20)}...
               </Badge>
@@ -135,10 +145,10 @@ export default function OnboardingSuccessPage({
               </CardHeader>
               <CardContent>
                 <a
-                  href="/portal"
+                  href="/portal/dashboard"
                   className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-2"
                 >
-                  Go to Portal →
+                  Go to Portal Dashboard →
                 </a>
               </CardContent>
             </Card>

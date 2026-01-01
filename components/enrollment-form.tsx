@@ -16,7 +16,6 @@ import {
 import { calculateMonthlyRate } from '@/lib/pricing';
 import { formatCurrency } from '@/lib/pricing';
 import { createEnrollment } from '@/app/actions/enrollment';
-import { createCheckoutSession } from '@/app/actions/stripe';
 import type { Member } from '@/db/schema';
 
 type FormStep = 1 | 2 | 3;
@@ -112,19 +111,29 @@ export function EnrollmentForm() {
         throw new Error(enrollmentResult.error || 'Failed to create enrollment');
       }
 
-      // Create Stripe checkout session
-      const checkoutResult = await createCheckoutSession(
-        enrollmentResult.monthlyRate || monthlyRate,
-        enrollmentResult.memberIds || [],
-        enrollmentResult.householdId
-      );
+      // Handle redirect based on payment mode
+      if (enrollmentResult.paymentMode === 'demo' && enrollmentResult.redirectUrl) {
+        // Demo mode: redirect to success page
+        window.location.href = enrollmentResult.redirectUrl;
+      } else if (enrollmentResult.paymentMode === 'stripe') {
+        // Stripe mode: create checkout session
+        const { createCheckoutSession } = await import('@/app/actions/stripe');
+        const checkoutResult = await createCheckoutSession(
+          enrollmentResult.monthlyRate || monthlyRate,
+          enrollmentResult.memberIds || [],
+          enrollmentResult.householdId
+        );
 
-      if (!checkoutResult.success || !checkoutResult.url) {
-        throw new Error(checkoutResult.error || 'Failed to create checkout session');
+        if (!checkoutResult.success || !checkoutResult.url) {
+          throw new Error(checkoutResult.error || 'Failed to create checkout session');
+        }
+
+        // Redirect to Stripe checkout
+        window.location.href = checkoutResult.url;
+      } else {
+        // Fallback: redirect to success page
+        window.location.href = '/onboarding/success';
       }
-
-      // Redirect to Stripe checkout
-      window.location.href = checkoutResult.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setIsSubmitting(false);
@@ -468,7 +477,7 @@ export function EnrollmentForm() {
                     disabled={isSubmitting}
                     className="bg-[#8A9A8A] hover:bg-[#7A8A7A] text-white"
                   >
-                    {isSubmitting ? 'Processing...' : 'Complete Enrollment & Pay'}
+                    {isSubmitting ? 'Processing...' : 'Complete Enrollment'}
                   </Button>
                 </div>
               </div>
