@@ -3,6 +3,50 @@ import { NinetyTenToggle } from '@/components/ninety-ten-toggle';
 import { PricingCards } from '@/components/pricing-cards';
 import { Button } from '@/components/ui/button';
 import { ScrollButton } from '@/components/scroll-button';
+import type { Metadata } from 'next';
+
+// SEO Metadata for Marketing Landing Page
+// Targeting "Missing Middle" personas: self-employed, small business owners, gig workers
+export const metadata: Metadata = {
+  title: "Direct Care Indy - Affordable Healthcare for the Missing Middle | DPC Membership",
+  description: "Direct Primary Care membership for self-employed professionals, small business owners, and gig workers. Transparent pricing ($30-$109/month), no insurance hassles, wholesale medication costs. Save an average of $3,732 per year with our 90/10 care model.",
+  keywords: [
+    "direct primary care",
+    "DPC membership",
+    "affordable healthcare",
+    "self-employed health insurance",
+    "small business healthcare",
+    "gig worker health insurance",
+    "missing middle healthcare",
+    "transparent healthcare pricing",
+    "wholesale medication pricing",
+    "Indiana direct care",
+  ],
+  openGraph: {
+    title: "Direct Care Indy - Affordable Healthcare for the Missing Middle",
+    description: "Direct Primary Care membership designed for self-employed professionals, small business owners, and gig workers. Transparent pricing, no insurance hassles, wholesale medication costs. Save $3,732/year on average.",
+    type: "website",
+    siteName: "Direct Care Indy",
+    images: [
+      {
+        url: "/og-image.jpg", // Add your OpenGraph image
+        width: 1200,
+        height: 630,
+        alt: "Direct Care Indy - Direct Primary Care Membership",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Direct Care Indy - Affordable Healthcare for the Missing Middle",
+    description: "DPC membership for self-employed professionals. Transparent pricing, no insurance hassles. Save $3,732/year on average.",
+  },
+  alternates: {
+    canonical: "https://directcareindy.com",
+  },
+};
+
+export const runtime = 'edge';
 
 export default function MarketingPage() {
   return (

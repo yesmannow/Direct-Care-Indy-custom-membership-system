@@ -30,6 +30,10 @@ export const inventory = sqliteTable('inventory', {
   stockLevel: integer('stock_level').notNull().default(0),
   description: text('description'),
   dosage: text('dosage'), // For medications: e.g., "500mg"
+  // FIFO & Inventory Management Fields
+  lotNumber: text('lot_number'), // Lot number for batch tracking
+  expirationDate: text('expiration_date'), // ISO date string for expiration tracking
+  parLevel: integer('par_level'), // Minimum stock level (PAR = Periodic Automatic Replenishment)
 });
 
 // Services Table - Define which services are covered (90%) vs insurance-only (10%)
@@ -38,6 +42,20 @@ export const services = sqliteTable('services', {
   name: text('name').notNull(),
   category: text('category').notNull(), // 'included' or 'insurance_only'
   description: text('description'),
+});
+
+// HIPAA-Compliant Audit Logs Table
+// Tracks "who, what, and when" for all PHI access and modifications
+export const auditLogs = sqliteTable('audit_logs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: text('user_id').notNull(), // Provider/admin user ID (from auth system)
+  action: text('action').notNull(), // 'READ', 'UPDATE', 'DELETE', 'CREATE'
+  resourceType: text('resource_type').notNull(), // 'Member', 'Medication', 'Lab', 'Household', etc.
+  resourceId: integer('resource_id').notNull(), // ID of the resource accessed/modified
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  ipAddress: text('ip_address'), // Optional: IP address for additional security tracking
+  userAgent: text('user_agent'), // Optional: User agent for additional context
+  details: text('details'), // Optional: JSON string with additional context about the action
 });
 
 // Relations
@@ -61,6 +79,8 @@ export const insertInventorySchema = createInsertSchema(inventory);
 export const selectInventorySchema = createSelectSchema(inventory);
 export const insertServiceSchema = createInsertSchema(services);
 export const selectServiceSchema = createSelectSchema(services);
+export const insertAuditLogSchema = createInsertSchema(auditLogs);
+export const selectAuditLogSchema = createSelectSchema(auditLogs);
 
 // Types
 export type Member = typeof members.$inferSelect;
@@ -71,3 +91,5 @@ export type InventoryItem = typeof inventory.$inferSelect;
 export type NewInventoryItem = typeof inventory.$inferInsert;
 export type Service = typeof services.$inferSelect;
 export type NewService = typeof services.$inferInsert;
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type NewAuditLog = typeof auditLogs.$inferInsert;

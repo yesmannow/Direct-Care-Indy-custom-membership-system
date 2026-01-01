@@ -1,5 +1,7 @@
 'use server';
 
+export const runtime = 'edge';
+
 import Stripe from 'stripe';
 
 // Initialize Stripe (use environment variable in production)
@@ -57,11 +59,14 @@ export async function createCheckoutSession(
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/portal?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/onboarding/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/join?canceled=true`,
       metadata: {
-        memberIds: memberIds.join(','),
-        householdId: householdId?.toString() || '',
+        // HIPAA Compliance: Only store internal IDs, never PHI (Date of Birth, Medical IDs, etc.)
+        // Use only MemberUUID (internal member IDs) for reconciliation
+        memberIds: memberIds.join(','), // Internal member IDs only - no PHI
+        householdId: householdId?.toString() || '', // Internal household ID only - no PHI
+        // NOTE: Do NOT include dateOfBirth, email, or any other PHI in metadata
       },
       customer_email: undefined, // Will be collected in checkout
     });

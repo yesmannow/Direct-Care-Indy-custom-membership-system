@@ -1,5 +1,7 @@
 'use server';
 
+export const runtime = 'edge';
+
 import { db } from '@/db';
 import { members, households } from '@/db/schema';
 import { calculateMonthlyRate } from '@/lib/pricing';
